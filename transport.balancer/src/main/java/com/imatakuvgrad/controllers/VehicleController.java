@@ -4,6 +4,7 @@ import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.EntityAnnotation;
 import com.google.cloud.vision.v1.Feature;
 import com.imatakuvgrad.VehicleType;
+import com.imatakuvgrad.dto.VehicleStateDto;
 import com.imatakuvgrad.models.Image;
 import com.imatakuvgrad.models.Vehicle;
 import com.imatakuvgrad.services.ImageService;
@@ -47,8 +48,11 @@ class VehicleController {
 
 
     @GetMapping(value = "/{id}")
-    public Vehicle findById(@PathVariable("id") Long id) {
-        return vehicleService.findById(id);
+    @ResponseBody
+    public VehicleStateDto findById(@PathVariable("id") Long id) {
+        Vehicle vehicle = vehicleService.findById(id);
+
+        return new VehicleStateDto(vehicle, imageService.findByVehicleOrderedByCreatedAt(vehicle).get(0));
     }
 
     @GetMapping(value = "/count")
