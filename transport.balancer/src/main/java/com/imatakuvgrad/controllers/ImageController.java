@@ -52,6 +52,14 @@ class ImageController {
                     HttpStatus.BAD_REQUEST, "Provide correct Vehicle Id");
         }
         image.setVehicle(vehicle);
+
+        Thread objDetection = new Thread(() -> objectDetection(image));
+        objDetection.start();
+
+        return imageService.create(image).getId();
+    }
+
+    private void objectDetection(Image image) {
         ByteArrayResource resource = new ByteArrayResource(image.getData());
         AnnotateImageResponse response =
                 this.cloudVisionTemplate.analyzeImage(
@@ -63,8 +71,6 @@ class ImageController {
                         .stream()
                         .map(EntityAnnotation::getDescription)
                         .collect(Collectors.toList());
-
-        return imageService.create(image).getId();
     }
 
 }
