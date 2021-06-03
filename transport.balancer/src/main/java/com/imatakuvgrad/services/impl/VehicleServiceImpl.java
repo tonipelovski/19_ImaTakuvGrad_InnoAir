@@ -4,6 +4,9 @@ import com.imatakuvgrad.models.Vehicle;
 import com.imatakuvgrad.repositories.VehicleRepository;
 import com.imatakuvgrad.services.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +25,11 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public Vehicle findById(Long id) {
         return vehicleRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Page<Vehicle> findPaginated(int page, int pageSize) {
+        return vehicleRepository.findAll(PageRequest.of(page, pageSize));
     }
 
     @Override
