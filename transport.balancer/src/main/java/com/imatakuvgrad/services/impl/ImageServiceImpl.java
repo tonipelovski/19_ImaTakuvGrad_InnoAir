@@ -26,7 +26,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Long create(Image image) {
-        return imageRepository.save(image).getId();
+    public Image create(Image image) {
+        return imageRepository.saveAndFlush(image);
     }
 }

@@ -12,19 +12,18 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "vehicleId")
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     private Vehicle vehicle;
 
     @Lob
     @NotNull
-    private Byte[] image;
+    private byte[] data;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -32,11 +31,19 @@ public class Image {
         this.id = id;
     }
 
-    public Byte[] getImage() {
-        return image;
+    public byte[] getData() {
+        return data;
     }
 
-    public void setImage(Byte[] image) {
-        this.image = image;
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 }

@@ -5,6 +5,7 @@ import com.imatakuvgrad.VehicleType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Entity
 public class Vehicle {
@@ -15,6 +16,5 @@ public class Vehicle {
 
     @NotNull
     private VehicleType type;
-
 
 }
