@@ -1,8 +1,6 @@
 package com.imatakuvgrad.controllers;
 
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.EntityAnnotation;
-import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.*;
 import com.imatakuvgrad.models.Image;
 import com.imatakuvgrad.models.Vehicle;
 import com.imatakuvgrad.services.ImageService;
@@ -14,8 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -44,32 +48,58 @@ class ImageController {
 
     @PostMapping
     @ResponseBody
-    public Long create(Image image, @RequestParam Long vehicleId) {
+    public HttpStatus create(Image image, @RequestParam Long vehicleId) {
         Vehicle vehicle = vehicleService.findById(vehicleId);
-        if (vehicle == null || image.getData().length == 0) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Provide correct Vehicle Id");
+        if (vehicle == null || image.getData() == null || image.getData().isEmpty()) {
+            return HttpStatus.BAD_REQUEST;
         }
         image.setVehicle(vehicle);
+        image.setPeopleCount(0);
 
         Thread objDetection = new Thread(() -> objectDetection(image));
         objDetection.start();
 
-        return imageService.create(image).getId();
+        imageService.create(image);
+        return HttpStatus.ACCEPTED;
     }
 
     private void objectDetection(Image image) {
-        ByteArrayResource resource = new ByteArrayResource(image.getData());
+        byte[] bytes = Base64.getDecoder().decode(image.getData());
+        ByteArrayResource resource = new ByteArrayResource(bytes);
         AnnotateImageResponse response =
                 this.cloudVisionTemplate.analyzeImage(
-                        resource, Feature.Type.LABEL_DETECTION);
+                        resource, Feature.Type.FACE_DETECTION);
+        List<FaceAnnotation> faceAnnotationsList = response.getFaceAnnotationsList();
+        BufferedImage bufferedImage = null;
+        try {
+            bufferedImage = ImageIO.read(new ByteArrayInputStream(bytes));
+            if (bufferedImage != null && !faceAnnotationsList.isEmpty()) {
+                for (FaceAnnotation faceAnnotation : faceAnnotationsList) {
+                    annotateWithFace(bufferedImage, faceAnnotation);
+                }
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream);
+                String base64Encoded = Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+                image.setData(base64Encoded);
+                image.setPeopleCount(faceAnnotationsList.size());
+            }
+            imageService.update(image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        List<String> imageLabels =
-                response
-                        .getLabelAnnotationsList()
-                        .stream()
-                        .map(EntityAnnotation::getDescription)
-                        .collect(Collectors.toList());
     }
 
+
+    private static void annotateWithFace(BufferedImage img, FaceAnnotation face) {
+        final int BORDER_COLOR = 0x00ff00;
+        Graphics2D gfx = img.createGraphics();
+        Polygon poly = new Polygon();
+        for (Vertex vertex : face.getFdBoundingPoly().getVerticesList()) {
+            poly.addPoint(vertex.getX(), vertex.getY());
+        }
+        gfx.setStroke(new BasicStroke(5));
+        gfx.setColor(new Color(BORDER_COLOR));
+        gfx.draw(poly);
+    }
 }

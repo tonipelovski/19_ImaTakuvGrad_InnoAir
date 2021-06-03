@@ -17,7 +17,10 @@ public class Image {
 
     @Lob
     @NotNull
-    private byte[] data;
+    private String data;
+
+    @NotNull
+    private Integer peopleCount;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -31,11 +34,11 @@ public class Image {
         this.id = id;
     }
 
-    public byte[] getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(byte[] data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -45,5 +48,13 @@ public class Image {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
+    }
+
+    public Integer getPeopleCount() {
+        return peopleCount;
+    }
+
+    public void setPeopleCount(Integer peopleCount) {
+        this.peopleCount = peopleCount;
     }
 }
