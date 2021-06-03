@@ -87,11 +87,11 @@
       <div class="container" data-aos="fade-up">
         <div class="row gx-0">
 
-          <h2 align = "center" class = "pagination-heading">Налични превозни средства</h2>
+          <h2 align = "center" class = "pagination-heading aos-init" style="color: #012970; font-weight: 700">Налични превозни средства</h2>
           <p align = "center" style="margin-bottom:5%">The best from the rest</p>
           <div class="list-group" id = "page" align="center">
             <ul>
-              <li class="list-item"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
+              <li class="list-item" onclick="parseVehicleNum(this);" value="2578"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
               <li class="list-item"> <button type="button" class="btn btn-primary btn-lg btn-block trol"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
               <li class="list-item"> <button type="button" class="btn btn-danger btn-lg btn-block bus"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
 
@@ -142,7 +142,7 @@
               <img src="https://portal.sofiatraffic.bg/assets/logo/CGM-Logo-300x300px.png" alt="">
               <span>ЦСАОПСМГТ</span>
             </a>
-            <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
+            <p>Изготвили: Йорданов, Пеловски, Киров и Стаменков<br></p>
             <div class="social-links mt-3">
               <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
               <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -208,12 +208,13 @@
       xhr.send();
     }
 
-    function searchVehicle(){
-        alert("HEllo");
-        parseVehicleNum();
+    function parseVehicleNum(param){
+        alert(param.value);
+        var vehicleNum = param.value;
+        window.location = './second.html?vehicleNum='+ vehicleNum;
     }
 
-    function parseVehicleNum(){
+    function searchVehicle(){
       var output = document.getElementById("page");
       var xhr = new XMLHttpRequest();
       var vehicleNum = document.getElementById("searchBar").value;

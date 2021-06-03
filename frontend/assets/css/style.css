@@ -2417,3 +2417,25 @@ section {
 .textColor{
   color:#0a58ca;
 }
+
+#heading-s{
+  margin-bottom:8%;
+}
+
+.imgData{
+  width:50%;
+  height:50%;
+  border-radius:5%;
+}
+
+.low{
+  color:green;
+}
+
+.medium{
+  color:yellow;
+}
+
+.full{
+  color:red;
+}
