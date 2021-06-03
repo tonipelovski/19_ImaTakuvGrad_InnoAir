@@ -13,6 +13,8 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -87,10 +89,7 @@
           <p align = "center" style="margin-bottom:5%">The best from the rest</p>
           <div class="list-group" id = "page" align="center">
             <ul>
-              <li class="list-item" onclick="parseVehicleNum(this);" value="2578"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
-              <li class="list-item"> <button type="button" class="btn btn-primary btn-lg btn-block trol"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
-              <li class="list-item"> <button type="button" class="btn btn-danger btn-lg btn-block bus"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">2812</span> </button></li>
-
+              
             </ul>
           </div>
           <div class="container">
@@ -177,7 +176,7 @@
 
   <script>
       var output = document.getElementById("page");
-      
+      /*
       var xhr = new XMLHttpRequest();
       var maxPage = 0;
       var url = "192.168.43.117:8080/vehicles/";
@@ -195,37 +194,44 @@
 	  //paginationContent.innerHTML += "<li class=""page-item""><a class=""page-link textColor"" href=""javascript:showPage("i+1", 10);"">"i+1"</a></li>";
 	  i++;
 	}
-
+*/
     var currentPage = 1;
 
     function showPage( page, pageSize ) {
       currentPage = page;
       var output = document.getElementById("page");
-      var xhr = new XMLHttpRequest();
+      var url = 'http://192.168.43.117:8080/vehicles/?page=' + page-1 + '&pageSize=' + pageSize;
 
-      var url = 'http://192.168.43.117:8080/vehicles/?page=' + page-1 + '&pageSize=' + 10;
-      xhr.open("GET", url, true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-		alert(json);
-          var json = JSON.parse(xhr.responseText);
-          output.innerHTML += '<ul id = "content">';
-          var content = document.getElementById("content");
-	  var paginationContent = document.getElementById("paginationContent");
-	  
+		$.ajax({     
+			type: "GET",
+			url: 'http://192.168.43.117:8080/vehicles/?page=0&size=10',
+			data: JSON,
+			success: function (data) {
+				alert(data[0].id);
+				var json = data;
 
-          var pageNum = 0;
-          for (var busNum in json) {
-	    pageNum += 1;
-            content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + busNum.id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + busNum.id + '</span> </button></li>'
-          }
-          output.innerHTML += '</ul>';
-	 
-        }
-      };
-      xhr.send();
+		      output.innerHTML += '<ul id = "content">';
+		      var content = document.getElementById("content");
+		  	  var paginationContent = document.getElementById("paginationContent");
+		  
+
+		      var pageNum = 0;
+			    var count = Object.keys(json).length;
+  				console.log(count);
+		      for (var i=0; i < count; i++) {
+				var id = json[i].id;
+
+				pageNum += 1;
+
+		        content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
+		      }
+		      output.innerHTML += '</ul>';
+			}
+		});
+
+	
     }
+    showPage(1, 10);
 
     function parseVehicleNum(param){
         alert(param.value);
@@ -233,17 +239,16 @@
         window.location = './second.html?vehicleNum='+ vehicleNum;
     }
 
+/*
     function searchVehicle(){
       var output = document.getElementById("page");
       var xhr = new XMLHttpRequest();
       var vehicleNum = document.getElementById("searchBar").value;
-
-      var url = "192.168.43.117:8080/vehicle/" + vehicleNum;
-      xhr.open("GET", url, true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          var json = JSON.parse(xhr.responseText);
+	var url = "192.168.43.117:8080/vehicle/" + vehicleNum;
+      
+	$.get("192.168.43.117:8080/vehicle/1", function(data, status){
+	    alert("Data: " + data + "\nStatus: " + status);
+		      var json = JSON.parse(xhr.responseText);
           output.innerHTML = "";
           output.innerHTML += '<ul id = "content">';
           var content = document.getElementById("content");
@@ -251,10 +256,11 @@
             content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + busNum.id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + busNum.id + '</span> </button></li>' 
           }
           output.innerHTML += '</ul>';
-        }
-      };
-      xhr.send();
+    
+	});
+	
     }
+*/
   </script>
 
 </body>
