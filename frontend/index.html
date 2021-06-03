@@ -45,8 +45,9 @@
 			<ul>
 				<li><a class="nav-link scrollto active" href="#hero">Начало</a></li>
 				<li><a class="nav-link scrollto" href="#vehiclesInfoSector">Превозни средства</a></li>
-				<li style="padding-left: 5%"><input class="form-control mr-sm-2" id="searchBar" type="search" placeholder="Номер на ПС" aria-label="Search"></li>
-				<li><a class="getstarted" onclick="searchVehicle();">Търсене</a></li>
+				<li style="padding-left: 5%"><input class="form-control mr-sm-2" id="searchBar" type="search"
+													placeholder="Номер на ПС" aria-label="Search"></li>
+				<li><a class="getstarted scrollto" href="javascript:searchVehicle();">Търсене</a></li>
 			</ul>
 			<i class="bi bi-list mobile-nav-toggle"></i>
 		</nav><!-- .navbar -->
@@ -168,6 +169,7 @@
 <!-- Vendor JS Files -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
 <script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/php-email-form/validate.js"></script>
 <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 <script src="assets/vendor/purecounter/purecounter.js"></script>
 <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
@@ -177,42 +179,76 @@
 <script src="assets/js/main.js"></script>
 
 <script>
+
     var output = document.getElementById("page");
-    var currentPage = 1;
+   	var maxPage = 0;
 
-    function showPage(page, pageSize) {
-        currentPage = page;
-        var output = document.getElementById("page");
-        var url = 'http://192.168.43.117:8080/vehicles/?page=' + page - 1 + '&pageSize=' + pageSize;
+	var currentPage = 1;
+	paginationNumber(10);
 
-        $.ajax({
+
+	function paginationNumber(pageSize){
+
+		$.ajax({
             type: "GET",
-            url: 'http://192.168.43.117:8080/vehicles/?page=0&size=10',
+            url: 'http://192.168.43.117:8080/vehicles/count',
             data: JSON,
             success: function (data) {
-                //alert(data[0].id);
-                var json = data;
+				maxPage = Math.floor(data/pageSize) + 1;
+				showPage(1, pageSize);
+				var i = 0;
+				var pages = document.getElementById("pages");
+				while(i < maxPage){
+					pages.innerHTML += '<li class="page-item"><a class="page-link textColor" href="javascript:showPage('+(i+1)+', 10);">'+(i+1)+'</a></li>';
+					pages.innerHTML += '<li class="page-item"><a class="page-link textColor" href="javascript:showPage(currentPage+1, 10);">Следваща</a></li>'
+					i++;
+				}
+			}
 
-                output.innerHTML += '<ul id = "content">';
-                var content = document.getElementById("content");
-                var paginationContent = document.getElementById("paginationContent");
 
-
-                var pageNum = 0;
-                var count = Object.keys(json).length;
-                console.log(count);
-                for (var i = 0; i < count; i++) {
-                    var id = json[i].id;
-                    var type = json[i].type;
-                    pageNum += 1;
-                    if(type === "TRAM")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
-                    if(type === "BUS")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-danger btn-lg btn-block bus"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
-                    if(type === "SUBWAY")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-primary btn-lg btn-block trol"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
-                }
-                output.innerHTML += '</ul>';
-            }
         });
 
+
+	}
+
+
+    function showPage(page, pageSize) {
+		if(page <= maxPage && page > 0){
+
+		    currentPage = page;
+		    var output = document.getElementById("page");
+		    var url = 'http://192.168.43.117:8080/vehicles/?page=' + page - 1 + '&pageSize=' + pageSize;
+
+		    $.ajax({
+		        type: "GET",
+		        url: 'http://192.168.43.117:8080/vehicles/?page=0&size=10',
+		        data: JSON,
+		        success: function (data) {
+		            var json = data;
+
+		            output.innerHTML = '<ul id = "content">';
+		            var content = document.getElementById("content");
+		            var paginationContent = document.getElementById("paginationContent");
+
+
+		            var pageNum = 0;
+		            var count = Object.keys(json).length;
+		            console.log(count);
+					$("#content").empty();
+		            for (var i = 0; i < count; i++) {
+		                var id = json[i].id;
+		                var type = json[i].type;
+		                pageNum += 1;
+		                if(type === "TRAM")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
+		                if(type === "BUS")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-danger btn-lg btn-block bus"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
+		                if(type === "SUBWAY")content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + id + '"> <button type="button" class="btn btn-primary btn-lg btn-block trol"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + id + '</span> </button></li>'
+		            }
+		            output.innerHTML += '</ul>';
+		        }
+		    });
+
+		}
+    }
 
     }
 
