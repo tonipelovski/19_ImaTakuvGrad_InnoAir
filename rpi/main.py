@@ -4,11 +4,13 @@ import os
 import requests
 import base64
 
+debug = False
+
 def main(argv):
     server_ip = ''
     send_image_interval = ''
     try:
-        opts, args = getopt.getopt(argv, "hi:n:", ["serverip=", "interval="])
+        opts, args = getopt.getopt(argv, "hdi:n:", ["serverip=", "interval=", "debug="])
     except getopt.GetoptError:
         print('main.py -i <ip>')
         sys.exit(2)
@@ -22,11 +24,16 @@ def main(argv):
         elif opt in ("-n", "--interval"):
             send_image_interval = int(arg)
             print(f'Send image interval: {send_image_interval}')
+        elif opt in ("-d", "--debug"):
+            global debug
+            debug = True
 
     while True:
-        print('taking picture...')
+        if debug:
+            print('taking picture...')
         take_picture()
-        print(f'sending image to endpoint {server_ip}/image/upload')
+        if debug:
+            print(f'sending image to endpoint {server_ip}/images')
         send_image_to_endpoint(server_ip)
         time.sleep(send_image_interval)
 
@@ -38,11 +45,14 @@ def send_image_to_endpoint(server_ip):
         url = f'http://{server_ip}/image/upload'
         with open("image.jpg", "rb") as img_file:
             encoded_image = base64.b64encode(img_file.read())
-        print(f'base64 encoded image: {encoded_image}')
+        if debug:
+            print(f'base64 encoded image: {encoded_image}')
         payload = {'data': encoded_image, 'vehicle' : 1}
-        print(f'payload: {payload}')
+        if debug:
+            print(f'payload: {payload}')
         response = requests.post(url, data=payload)
-        print(response)
+        if debug:
+            print(response)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
 
