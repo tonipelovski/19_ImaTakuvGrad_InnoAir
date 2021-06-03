@@ -38,19 +38,17 @@ def main(argv):
         time.sleep(send_image_interval)
 
 def take_picture():
-    os.system('fswebcam -r 1920x1080 --no-banner image.jpg')
+    os.system('fswebcam -r 640x480 --no-banner image.png')
 
 def send_image_to_endpoint(server_ip):
     try:
-        url = f'http://{server_ip}/image/upload'
-        with open("image.jpg", "rb") as img_file:
+        url = f'http://{server_ip}:8080/images'
+        with open("image.png", "rb") as img_file:
             encoded_image = base64.b64encode(img_file.read())
+        payload = {'data': encoded_image}
         if debug:
-            print(f'base64 encoded image: {encoded_image}')
-        payload = {'data': encoded_image, 'vehicle' : 1}
-        if debug:
-            print(f'payload: {payload}')
-        response = requests.post(url, data=payload)
+            print(url)
+        response = requests.post(url, data=payload, params={"vehicleId": 1})
         if debug:
             print(response)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
