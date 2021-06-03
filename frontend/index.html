@@ -10,10 +10,6 @@
 
   <meta content="" name="keywords">
 
-  <!-- Favicons -->
-  <link href="https://portal.sofiatraffic.bg/assets/logo/CGM-Logo-300x300px.png" rel="icon">
-  <link href="https://portal.sofiatraffic.bg/assets/logo/CGM-Logo-300x300px.png" rel="apple-touch-icon">
-
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
@@ -106,8 +102,6 @@
                 <nav aria-label="Page navigation example">
                   <ul class="pagination" style="margin-left:20%;">
                     <li class="page-item"><a class="page-link textColor" href="javascript:showPage(currentPage-1, 10);">Предишна</a></li>
-                    <li class="page-item"><a class="page-link textColor" href="javascript:showPage(1, 10);">1</a></li>
-                    <li class="page-item"><a class="page-link textColor" href="javascript:showPage(2, 10);">2</a></li>
                     <li class="page-item"><a class="page-link textColor" href="javascript:showPage(currentPage+1, 10);">Следваща</a></li>
                   </ul>
                 </nav>
@@ -182,27 +176,52 @@
   <script src="assets/js/main.js"></script>
 
   <script>
-
-    var currentPage = 1;
-    function showPage( page, pageSize ) {
-      currentPage = page;
       var output = document.getElementById("page");
+      
       var xhr = new XMLHttpRequest();
-
-      var url = "*?page=" + page;
+      var maxPage = 0;
+      var url = "192.168.43.117:8080/vehicles/";
       xhr.open("GET", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
           var json = JSON.parse(xhr.responseText);
+          maxPage = json.number/10;
+        }
+      };
+      xhr.send();
+	var i = 0;
+	while(i < maxPage){
+	  //paginationContent.innerHTML += "<li class=""page-item""><a class=""page-link textColor"" href=""javascript:showPage("i+1", 10);"">"i+1"</a></li>";
+	  i++;
+	}
+
+    var currentPage = 1;
+
+    function showPage( page, pageSize ) {
+      currentPage = page;
+      var output = document.getElementById("page");
+      var xhr = new XMLHttpRequest();
+
+      var url = 'http://192.168.43.117:8080/vehicles/?page=' + page-1 + '&pageSize=' + 10;
+      xhr.open("GET", url, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+		alert(json);
+          var json = JSON.parse(xhr.responseText);
           output.innerHTML += '<ul id = "content">';
           var content = document.getElementById("content");
+	  var paginationContent = document.getElementById("paginationContent");
+	  
+
+          var pageNum = 0;
           for (var busNum in json) {
-            content.innerHTML += '<li>' + busNum;
-            content.innerHTML += '</li>';
+	    pageNum += 1;
+            content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + busNum.id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + busNum.id + '</span> </button></li>'
           }
           output.innerHTML += '</ul>';
-
+	 
         }
       };
       xhr.send();
@@ -219,7 +238,7 @@
       var xhr = new XMLHttpRequest();
       var vehicleNum = document.getElementById("searchBar").value;
 
-      var url = "*?page=" + vehicleNum;
+      var url = "192.168.43.117:8080/vehicle/" + vehicleNum;
       xhr.open("GET", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.onreadystatechange = function () {
@@ -229,8 +248,7 @@
           output.innerHTML += '<ul id = "content">';
           var content = document.getElementById("content");
           for (var busNum in json) {
-            content.innerHTML += '<li>' + busNum;
-            content.innerHTML += '</li>';
+            content.innerHTML += '<li class="list-item" onclick="parseVehicleNum(this);" value="' + busNum.id + '"> <button type="button" class="btn btn-warning btn-lg btn-block tram"><p class="vehicle-num"> <i class="fa fa-bus" class="icon"></i>  </p> <span class="vehicle-num">' + busNum.id + '</span> </button></li>' 
           }
           output.innerHTML += '</ul>';
         }
