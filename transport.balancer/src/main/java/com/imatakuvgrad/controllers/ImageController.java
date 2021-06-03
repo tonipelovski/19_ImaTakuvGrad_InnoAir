@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/images")
 class ImageController {
 
@@ -42,6 +43,7 @@ class ImageController {
     }
 
     @PostMapping
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @ResponseBody
     public Long create(Image image, @RequestParam Long vehicleId) {
         Vehicle vehicle = vehicleService.findById(vehicleId);
