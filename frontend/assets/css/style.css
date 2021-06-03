@@ -2423,8 +2423,8 @@ section {
 }
 
 .imgData{
-  width:50%;
-  height:50%;
+  width:120%;
+  height:auto;
   border-radius:5%;
 }
 
