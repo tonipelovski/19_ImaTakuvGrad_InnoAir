@@ -10,4 +10,5 @@ public interface VehicleService {
     Page<Vehicle> findPaginated(int page, int pageSize);
     Vehicle findById(Long id);
     Vehicle create(Vehicle vehicle);
+    Long count();
 }

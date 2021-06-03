@@ -43,11 +43,10 @@ class ImageController {
     }
 
     @PostMapping
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @ResponseBody
     public Long create(Image image, @RequestParam Long vehicleId) {
         Vehicle vehicle = vehicleService.findById(vehicleId);
-        if (vehicle == null) {
+        if (vehicle == null || image.getData().length == 0) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Provide correct Vehicle Id");
         }

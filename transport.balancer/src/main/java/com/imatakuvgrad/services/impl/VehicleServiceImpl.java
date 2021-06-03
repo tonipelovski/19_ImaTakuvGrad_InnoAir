@@ -36,4 +36,9 @@ public class VehicleServiceImpl implements VehicleService {
     public Vehicle create(Vehicle vehicle) {
         return vehicleRepository.saveAndFlush(vehicle);
     }
+
+    @Override
+    public Long count() {
+        return vehicleRepository.count();
+    }
 }

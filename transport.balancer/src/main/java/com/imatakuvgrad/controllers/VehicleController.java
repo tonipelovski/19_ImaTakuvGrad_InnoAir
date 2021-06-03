@@ -51,13 +51,16 @@ class VehicleController {
         return vehicleService.findById(id);
     }
 
+    @GetMapping(value = "/count")
+    @ResponseBody
+    public Long countVehicles() {
+        return vehicleService.count();
+    }
+
     @PostMapping
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @ResponseBody
     public Long create(Vehicle vehicle) {
-        vehicleService.create(vehicle);
-        VehicleType.valueOf("BUS");
-        return 0L;
+        return vehicleService.create(vehicle).getId();
     }
 
 }
