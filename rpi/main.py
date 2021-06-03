@@ -2,6 +2,7 @@ import sys, getopt
 import time
 import os
 import requests
+import base64
 
 def main(argv):
     server_ip = ''
@@ -35,8 +36,12 @@ def take_picture():
 def send_image_to_endpoint(server_ip):
     try:
         url = f'http://{server_ip}/image/upload'
-        files = {'media': open('image.png', 'rb')}
-        response = requests.post(url, files=files)
+        with open("image.jpg", "rb") as img_file:
+            encoded_image = base64.b64encode(img_file.read())
+        print(f'base64 encoded image: {encoded_image}')
+        payload = {'data': encoded_image, 'vehicle' : 1}
+        print(f'payload: {payload}')
+        response = requests.post(url, data=payload)
         print(response)
     except requests.exceptions.RequestException as e:  # This is the correct syntax
         print(e)
